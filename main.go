@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 )
@@ -28,25 +27,32 @@ func main() {
 	apiKEY := os.Getenv("API_KEY") //variable de entorno
 	println("pase por getenv")
 
-	var jsonBodyResp ResponseBody
 	url := "https://api.the-odds-api.com/v3/sports/?apiKey=" + apiKEY
-
-	resp, err := http.Get(url)
+	jsonBodyResp, err := GetSports(url)
 	if err != nil {
 		println(err)
+	}
+	fmt.Println(jsonBodyResp)
+}
+
+func GetSports(url string) (*ResponseBody, error) {
+	var jsonBodyResp ResponseBody
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	responseData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Print(err.Error())
-		os.Exit(1)
+		return nil, err
+
 	}
 
 	err = json.Unmarshal(responseData, &jsonBodyResp)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return nil, err
+
 	}
-	fmt.Println(jsonBodyResp.Data)
+	return &jsonBodyResp, nil
 }
