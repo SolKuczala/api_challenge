@@ -21,15 +21,16 @@ type ResponseBody struct {
 	} `json:"data"`
 }
 
-var apiKEY = "c451435480578edc86c4de5e3d6275cf" //variable de entorno
-//var dataBaseConnection = "string"               //no se bien como, variable de entorno
+//var dataBaseConnection = "string"//no se bien como, variable de entorno
 
 func main() {
+
+	apiKEY := os.Getenv("API_KEY") //variable de entorno
+	println("pase por getenv")
+
 	var jsonBodyResp ResponseBody
-	//keywords = "developer"
-	//api := os.Getenv(apiKEY)
 	url := "https://api.the-odds-api.com/v3/sports/?apiKey=" + apiKEY
-	fmt.Println("good") //https://api.the-odds-api.com/v3/sports/?apiKey=c451435480578edc86c4de5e3d6275cf
+
 	resp, err := http.Get(url)
 	if err != nil {
 		println(err)
