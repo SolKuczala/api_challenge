@@ -3,29 +3,18 @@ package db
 type DBClient struct {
 }
 
-func (db *DBClient) Save() error {
-
-	return "new connection"
-
-	//return &DBClient{
-	//	DBClient: client
-	//}, nil
+func NewDBClient(conString string) (*DBClient, error) {
+	return &DBClient{}, nil
 }
 
-func (db *DBClient) Close() error {
-
-	return "new connection"
-
-	//return &DBClient{
-	//	DBClient: client
-	//}, nil
+func (db *DBClient) Save() (string, error) {
+	return "new connection", nil
 }
 
-func (db *DBClient) Update() error {
+func (db *DBClient) Close() (string, error) {
+	return "new connection", nil
+}
 
-	return "new connection"
-
-	//return &DBClient{
-	//	DBClient: client
-	//}, nil
+func (db *DBClient) Update() (string, error) {
+	return "new connection", nil
 }

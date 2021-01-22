@@ -2,19 +2,29 @@ package main
 
 import (
 	"bet_challenge/api"
+	"bet_challenge/db"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
-//var dataBaseConnection = "string"//no se bien como, variable de entorno
-
 func main() {
-	apiKey := os.Getenv("API_KEY") //variable de entorno
-	db.NewDBClient()
-	defer db.Close()
-	client, _ := api.NewOddsAPIClient(apiKey, api.DEFAULT_BASE_URL)
-	sports, _ := api.GetSports(*client)
-	db.Store(sports)
+	apiKey := os.Getenv("API_KEY")
+	dbConString := os.Getenv("DB_CON_STRING")
+	if len(apiKey) < 1 || len(apiKey) < 1 {
+		log.Fatal("Invalid env variables")
+	}
 
-	//odds, err := api.GetOdds(*client)
+	DB, err := db.NewDBClient(dbConString)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer DB.Close()
 
+	client, err := api.NewClient(apiKey, api.DEFAULT_BASE_URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Info(client.GetSports())
 }
