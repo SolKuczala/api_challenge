@@ -26,5 +26,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Info(client.GetSports())
+	sports, err := client.GetSports()
+	if err != nil {
+		log.Error(err)
+	}
+	for _, sport := range sports {
+		log.Info(sport)
+	}
 }
