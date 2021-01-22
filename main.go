@@ -33,4 +33,12 @@ func main() {
 	for _, sport := range sports {
 		log.Info(sport)
 	}
+
+	odds, err := client.GetOdds("soccer_epl", "uk", "h2h")
+	if err != nil {
+		log.Error(err)
+	}
+	for _, odds := range odds {
+		log.Info(odds)
+	}
 }
