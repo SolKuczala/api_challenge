@@ -1,4 +1,4 @@
-package api
+package oddsapi
 
 type Sport struct {
 	Key          string `json:"key"`

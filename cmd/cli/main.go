@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bet_challenge/api"
-	"bet_challenge/db"
+	"bet_challenge/internal/db"
+	"bet_challenge/pkg/oddsapi"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -21,7 +21,7 @@ func main() {
 	}
 	defer DB.Close()
 
-	client, err := api.NewClient(apiKey, api.DEFAULT_BASE_URL)
+	client, err := oddsapi.NewClient(apiKey, oddsapi.DEFAULT_BASE_URL)
 	if err != nil {
 		log.Fatal(err)
 	}
