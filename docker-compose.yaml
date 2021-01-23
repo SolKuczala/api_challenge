@@ -4,3 +4,9 @@ services:
   oddsapi:
     build: ./
     env_file: .env
+    depends_on: 
+      - oddsdb
+  
+  oddsdb:
+    image: mongo
+    env_file: .env
