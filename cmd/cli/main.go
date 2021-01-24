@@ -30,15 +30,33 @@ func main() {
 	if err != nil {
 		log.Error(err)
 	}
+
 	for _, sport := range sports {
 		DB.SaveSport(&sport)
 	}
 
-	//odds, err := client.GetOdds("soccer_epl", "uk", "h2h")
-	//if err != nil {
-	//	log.Error(err)
-	//}
-	//for _, odds := range odds {
-	//	log.Info(odds)
-	//}
+	odds, err := client.GetOdds("soccer_epl", "uk", "h2h")
+	if err != nil {
+		log.Error(err)
+	}
+	for _, odds := range odds {
+		log.Info(odds)
+	}
+
+	for collectionName, keyName := range map[string]string{
+		db.COLLECTION_SPORTS: "key",
+		db.COLLECTION_ODDS:   "sport_key",
+	} {
+		indexName, err := DB.CreateIndex(collectionName, keyName)
+		if err != nil {
+			log.Error("Failed to create index: ", collectionName, ":", keyName)
+			log.Error(err)
+		}
+		log.Info("Created index: ", indexName)
+		err = DB.PrintIndexes(collectionName)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+
 }

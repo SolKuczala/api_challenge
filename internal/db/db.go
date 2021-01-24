@@ -44,9 +44,44 @@ func NewDBClient(conString string) (*DBClient, error) {
 		log.Error("Failed to list databases")
 		return nil, err
 	}
-	log.WithFields(log.Fields{"dbs": databases}).Info("Found databases")
 
+	log.WithFields(log.Fields{"dbs": databases}).Info("Found databases")
 	return &DBClient{client}, nil
+}
+
+func (dbc *DBClient) CreateIndex(collectionName, keyName string) (string, error) {
+	log.Info("Creating index: ", DATA_BASE, ":", collectionName, ":", keyName)
+	indexView := dbc.client.Database(DATA_BASE).Collection(collectionName).Indexes()
+
+	model := mongo.IndexModel{
+		Keys: bson.M{
+			"key": 1,
+		}, Options: options.Index().SetName("index_" + keyName),
+	}
+
+	indexName, err := indexView.CreateOne(context.Background(), model, options.CreateIndexes())
+	if err != nil {
+		log.Error("Failed to create index")
+		return "", err
+	}
+	return indexName, err
+}
+
+func (dbc *DBClient) PrintIndexes(collectionName string) error {
+	indexView := dbc.client.Database(DATA_BASE).Collection(collectionName).Indexes()
+	cursor, err := indexView.List(context.Background(), options.ListIndexes())
+	if err != nil {
+		log.Error("Failed to list indexes")
+		return err
+	}
+	var results []bson.M
+	if err = cursor.All(context.Background(), &results); err != nil {
+		log.Fatal(err)
+	}
+	for _, result := range results {
+		log.Info("Found index: ", result)
+	}
+	return nil
 }
 
 func (dbc *DBClient) SaveSport(sport *oddsapi.Sport) error {

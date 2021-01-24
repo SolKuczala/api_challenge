@@ -10,3 +10,5 @@ services:
   oddsdb:
     image: mongo
     env_file: .env
+    volumes: 
+      - ./db-data/:/data/db/
