@@ -18,3 +18,5 @@ show collections
 
 db.sports.count()
 db.sports.getIndexes()
+//show
+db.sports.find()
