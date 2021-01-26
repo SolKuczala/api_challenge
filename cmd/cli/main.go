@@ -18,49 +18,20 @@ func main() {
 		log.Fatal(err)
 	}
 	defer DB.Close()
-	defineDBIndexes(DB)
+	//	defineDBIndexes(DB)
 
 	client, err := oddsapi.NewClient(apiKey, oddsapi.DEFAULT_BASE_URL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	////test
-	sports := []oddsapi.Sport{
-		oddsapi.Sport{
-			Key:    "americanfootball_nfl",
-			Active: true,
-			Group:  "American Football"},
-	}
-	//guardo
-	for _, sport := range sports {
-		DB.SaveSport(&sport)
-	}
-
-	sports = []oddsapi.Sport{
-		oddsapi.Sport{
-			Key:    "americanfootball_nfl",
-			Active: true,
-			Group:  "susiQuiu"},
-		oddsapi.Sport{
-			Key:    "soccer_international",
-			Active: true,
-			Group:  "Random futbol"},
-	}
-	for _, sport := range sports {
-		DB.SaveSport(&sport)
-	}
-	////test
-	os.Exit(0)
-
-	sports, err = client.GetSports()
+	sports, err := client.GetSports()
 	if err != nil {
 		log.Error(err)
 	}
 
 	for _, sport := range sports {
 		DB.SaveSport(&sport)
-		log.Info(sport)
 	}
 
 	odds, err := client.GetOdds("soccer_epl", "uk", "h2h")
@@ -69,11 +40,11 @@ func main() {
 	}
 
 	for _, odd := range odds {
-		DB.SaveOdds(&odd)
-		log.Info(odd)
+		DB.SaveMatch(&odd)
 	}
-	for range time.Tick(time.Minute * 1) {
+	for range time.Tick(time.Second * 5) {
 		//matches which are not in-play should be updated every hour
+		log.Info("Executing new call from ticker...")
 	}
 }
 
@@ -89,7 +60,7 @@ func getEnv() (string, string) {
 func defineDBIndexes(DB *db.DBClient) {
 	for collectionName, keys := range map[string]bson.M{
 		db.COLLECTION_SPORTS: bson.M{"key": 1},
-		db.COLLECTION_ODDS:   bson.M{"sport_key": 1, "teams": 1, "commence_time": 1},
+		db.COLLECTION_ODDS:   bson.M{"sport_key": 1, "home_team": 1, "commence_time": 1},
 	} {
 		indexName, err := DB.CreateIndex(collectionName, keys)
 		if err != nil {

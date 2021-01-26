@@ -88,48 +88,52 @@ func (dbc *DBClient) SaveSport(sport *oddsapi.Sport) error {
 	result := collection.FindOne(context.Background(), filter)
 	err := result.Err()
 	if err == mongo.ErrNoDocuments {
-		log.Info("Sport not found, assuming new")
 		insertResult, err := collection.InsertOne(context.Background(), sport)
 		if err != nil {
-			log.Error("Failed to insert sport")
+			log.Error(err)
+			log.Error("Failed to insert sport: ", sport)
 			return err
 		}
-		log.WithFields(log.Fields{"ID": insertResult.InsertedID}).Info("new Sport inserted")
+		log.WithFields(log.Fields{"ID": insertResult.InsertedID}).Info("new Sport inserted: ", sport)
 	} else {
-		log.Info("Sport found, replacing content")
 		result := collection.FindOneAndReplace(context.Background(), filter, sport)
 		err := result.Err()
 		if err != nil {
-			log.Info("Failed to replace Sport")
+			log.Error(err)
+			log.Info("Failed to replace Sport: ", sport)
 			return err
 		}
-		log.Info("Sport replaced")
+		log.Info("Sport replaced: ", sport)
 	}
 	return nil
 }
 
-func (dbc *DBClient) SaveOdds(matches *oddsapi.Match) error {
+func (dbc *DBClient) SaveMatch(match *oddsapi.Match) error {
+	filter := bson.M{"sport_key": match.SportKey, "home_team": match.HomeTeam, "commence_time": match.CommenceTimeUnix}
 	collection := dbc.client.Database(DATA_BASE).Collection(COLLECTION_ODDS)
-	insertResult, err := collection.InsertOne(context.Background(), matches)
-	if err != nil {
-		log.Error("Failed to save match")
-		return err
+	result := collection.FindOne(context.Background(), filter)
+	err := result.Err()
+	if err == mongo.ErrNoDocuments {
+		insertResult, err := collection.InsertOne(context.Background(), match)
+		if err != nil {
+			log.Error(err)
+			log.Error("Failed to insert match: ", match)
+			return err
+		}
+		log.WithFields(log.Fields{"ID": insertResult.InsertedID}).Info("new Match inserted: ", match)
+	} else {
+		result := collection.FindOneAndReplace(context.Background(), filter, match)
+		err := result.Err()
+		if err != nil {
+			log.Error(err)
+			log.Info("Failed to replace Match: ", match)
+			return err
+		}
+		log.Info("Match replaced: ", match)
 	}
-	log.WithFields(log.Fields{"Inserted match with ID:": insertResult.InsertedID}).Info("match saved")
 	return nil
 }
 
-func (dbc *DBClient) UpdateMatch(sport *oddsapi.Sport) {
-	collection := dbc.client.Database(DATA_BASE).Collection(COLLECTION_SPORTS)
-	result, err := collection.UpdateOne(context.Background(), nil, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if result.MatchedCount != 0 {
-		log.Info("matched and replaced an existing document")
-	}
-}
 func (db *DBClient) Close() {
 	db.client.Disconnect(context.Background())
 }
