@@ -4,10 +4,8 @@ import (
 	"bet_challenge/internal/db"
 	"bet_challenge/pkg/oddsapi"
 	"os"
-	"time"
 
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func main() {
@@ -42,12 +40,7 @@ func main() {
 		DB.SaveMatch(&odd)
 	}
 
-	for range time.Tick(time.Minute * 1) {
-		log.Info("Executing new call from ticker...")
-		for _, odd := range odds {
-			DB.SaveMatch(&odd)
-		}
-	}
+	DB.UpdateOddsEvery(60, odds)
 }
 
 func getEnv() (string, string) {
@@ -59,19 +52,19 @@ func getEnv() (string, string) {
 	return apiKey, dbConString
 }
 
-func defineDBIndexes(DB *db.DBClient) {
-	for collectionName, keys := range map[string]bson.M{
-		db.COLLECTION_ODDS: bson.M{"sport_key": 1, "home_team": 1, "commence_time": 1},
-	} {
-		indexName, err := DB.CreateIndex(collectionName, keys)
-		if err != nil {
-			log.Error("Failed to create index: ", collectionName, ":", keys)
-			log.Error(err)
-		}
-		log.Info("Created index: ", indexName)
-		err = DB.PrintIndexes(collectionName)
-		if err != nil {
-			log.Error(err)
-		}
-	}
-}
+//func defineDBIndexes(DB *db.DBClient) {
+//	for collectionName, keys := range map[string]bson.M{
+//		db.COLLECTION_ODDS: bson.M{"sport_key": 1, "home_team": 1, "commence_time": 1},
+//	} {
+//		indexName, err := DB.CreateIndex(collectionName, keys)
+//		if err != nil {
+//			log.Error("Failed to create index: ", collectionName, ":", keys)
+//			log.Error(err)
+//		}
+//		log.Info("Created index: ", indexName)
+//		err = DB.PrintIndexes(collectionName)
+//		if err != nil {
+//			log.Error(err)
+//		}
+//	}
+//}

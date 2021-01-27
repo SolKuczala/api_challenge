@@ -3,6 +3,7 @@ package db
 import (
 	"bet_challenge/pkg/oddsapi"
 	"context"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"
@@ -142,6 +143,15 @@ func (dbc *DBClient) SaveMatch(match *oddsapi.Match) error {
 		log.Info("Match replaced: ", match)
 	}
 	return nil
+}
+
+func (db *DBClient) UpdateOddsEvery(minutes int, odds []oddsapi.Match) {
+	for range time.Tick(time.Second * time.Duration(minutes)) {
+		log.Info("Executing new call from ticker...")
+		for _, odd := range odds {
+			db.SaveMatch(&odd)
+		}
+	}
 }
 
 func (db *DBClient) Close() {

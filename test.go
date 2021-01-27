@@ -12,3 +12,8 @@ package test
 //		Active: true,
 //		Group:  "Random futbol"},
 //}
+//&oddsapi.Match{
+//	SportKey:         "pepito",
+//	CommenceTimeUnix: 1611777600,
+//	HomeTeam:         "pepita",
+//}
