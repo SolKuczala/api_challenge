@@ -110,7 +110,7 @@ func (dbc *DBClient) SaveSport(sport *oddsapi.Sport) error {
 }
 
 func (dbc *DBClient) SaveMatch(match *oddsapi.Match) error {
-	log.Info("Saving Match>>>>>>>>>>>>>.")
+	log.Info("Saving Match>>>>>>>>>>>>>")
 	filter := bson.M{
 		"sportkey":         match.SportKey,
 		"hometeam":         match.HomeTeam,
@@ -118,11 +118,9 @@ func (dbc *DBClient) SaveMatch(match *oddsapi.Match) error {
 	}
 
 	collection := dbc.client.Database(DATA_BASE).Collection(COLLECTION_ODDS)
-	//tries to find if something with this fields exists
 	result := collection.FindOne(context.TODO(), filter)
 	err := result.Err()
 	log.Info("error: ", err)
-	//if not, insert, como se si no?
 	if err == mongo.ErrNoDocuments {
 		insertResult, err := collection.InsertOne(context.TODO(), match)
 		if err != nil {
@@ -146,6 +144,7 @@ func (dbc *DBClient) SaveMatch(match *oddsapi.Match) error {
 }
 
 func (db *DBClient) UpdateOddsEvery(minutes int, odds []oddsapi.Match) {
+	log.Info("Looking for updates>>>>>>>>>>>>>")
 	for range time.Tick(time.Second * time.Duration(minutes)) {
 		log.Info("Executing new call from ticker...")
 		for _, odd := range odds {

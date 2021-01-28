@@ -4,12 +4,13 @@ import (
 	"bet_challenge/internal/db"
 	"bet_challenge/pkg/oddsapi"
 	"os"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	apiKey, dbConString := getEnv()
+	apiKey, dbConString, minutes := getEnv()
 
 	DB, err := db.NewDBClient(dbConString)
 	if err != nil {
@@ -30,7 +31,7 @@ func main() {
 	for _, sport := range sports {
 		DB.SaveSport(&sport)
 	}
-	//defineDBIndexes(DB)
+
 	odds, err := client.GetOdds("upcoming", "uk", "h2h")
 	if err != nil {
 		log.Error(err)
@@ -40,16 +41,21 @@ func main() {
 		DB.SaveMatch(&odd)
 	}
 
-	DB.UpdateOddsEvery(60, odds)
+	DB.UpdateOddsEvery(minutes, odds)
 }
 
-func getEnv() (string, string) {
+func getEnv() (string, string, int) {
 	apiKey := os.Getenv("API_KEY")
 	dbConString := os.Getenv("DB_CON_STRING")
-	if len(apiKey) < 1 || len(apiKey) < 1 {
+	time := os.Getenv("MINUTES")
+	if len(apiKey) < 1 || len(apiKey) < 1 || len(time) < 1 {
 		log.Fatal("Invalid env variables")
 	}
-	return apiKey, dbConString
+	minutes, err := strconv.Atoi(time)
+	if err != nil {
+		log.Fatal("Could not get time for update", err)
+	}
+	return apiKey, dbConString, minutes
 }
 
 //func defineDBIndexes(DB *db.DBClient) {
