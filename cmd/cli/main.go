@@ -57,20 +57,3 @@ func getEnv() (string, string, int) {
 	}
 	return apiKey, dbConString, minutes
 }
-
-//func defineDBIndexes(DB *db.DBClient) {
-//	for collectionName, keys := range map[string]bson.M{
-//		db.COLLECTION_ODDS: bson.M{"sport_key": 1, "home_team": 1, "commence_time": 1},
-//	} {
-//		indexName, err := DB.CreateIndex(collectionName, keys)
-//		if err != nil {
-//			log.Error("Failed to create index: ", collectionName, ":", keys)
-//			log.Error(err)
-//		}
-//		log.Info("Created index: ", indexName)
-//		err = DB.PrintIndexes(collectionName)
-//		if err != nil {
-//			log.Error(err)
-//		}
-//	}
-//}
