@@ -1,5 +1,7 @@
 # Odds API challenge
 
+# Currently disabled as .env file must be set, but code logic can be seen.
+
 ## How to build it & run it
 
 > make build && make run  
